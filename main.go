@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -18,12 +19,18 @@ var clientID string = "a9707d9bd77e483881a10560f5bdb42d"
 var clientSecret string
 
 var spotifyAuthorizeURI = "https://accounts.spotify.com/authorize?"
-var spotifyTokenURI = "https://accounts.spotify.com/api/token?"
+var spotifyTokenURI = "https://accounts.spotify.com/api/token"
+var spotifyApiURI = "https://api.spotify.com/v1"
 
 var state = "ajd93hflahe93lhf"
+var redirectUri = "http://localhost:3008/token"
+
+var myId = "onthe_dl"
 
 type server struct {
-	mux *mux.Router
+	mux           *mux.Router
+	token         tokenResponse
+	timeToRefresh time.Time
 }
 
 func (s server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
