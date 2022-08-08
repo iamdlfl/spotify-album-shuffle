@@ -57,7 +57,7 @@ func (s server) handleShuffle() http.HandlerFunc {
 
 func (s server) handleLogin() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		scope := "user-read-private user-read-email"
+		scope := "user-read-private user-read-email playlist-modify-private playlist-modify-public"
 
 		apiUri := fmt.Sprintf("%sresponse_type=code&client_id=%s&scope=%s&redirect_uri=%s&state=%s", spotifyAuthorizeURI, clientID, scope, redirectUri, state)
 		http.Redirect(w, r, apiUri, http.StatusOK)
