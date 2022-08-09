@@ -27,6 +27,8 @@ var redirectUri = "http://localhost:3008/token"
 
 var myId = "onthe_dl"
 
+var httpRoot http.FileSystem
+
 type server struct {
 	mux           *mux.Router
 	token         tokenResponse
@@ -48,6 +50,7 @@ func run() error {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
 	var s server
+	httpRoot = http.Dir("./static/")
 	s.routes()
 
 	log.Printf("server listening at http://localhost:%s\n", port)

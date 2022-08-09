@@ -34,12 +34,6 @@ func (s server) Handle404() http.HandlerFunc {
 	}
 }
 
-func (s server) handleHome() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, "This is the shuffle home!", http.StatusOK)
-	}
-}
-
 func (s *server) handleHello() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := make(map[string]interface{}, 0)

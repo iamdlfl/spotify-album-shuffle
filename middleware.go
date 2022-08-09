@@ -81,3 +81,14 @@ func (s *server) CheckToken(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+// Middleware that allows any origin and handles OPTIONS request
+func CorsOriginMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		if r.Method == http.MethodOptions {
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
