@@ -34,42 +34,45 @@ func (s server) Handle404() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleHello() http.HandlerFunc {
+func (s *server) handleIsLoggedIn() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data := make(map[string]interface{}, 0)
-		data["message"] = "Hello, World!"
-		data["token"] = s.token
+		data := make(map[string]bool)
+		data["logged_in"] = false
+		if time.Now().After(s.timeToRefresh) {
+			s.respond(w, r, data, http.StatusOK)
+			return
+		}
+		// time to refresh will default to 0 time, so if user has not been logged in yet it will always return true
+		data["logged_in"] = true
 		s.respond(w, r, data, http.StatusOK)
-	}
-}
-
-func (s server) handleShuffle() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, "Handler not yet implemented", http.StatusOK)
 	}
 }
 
 func (s server) handleLogin() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		scope := "user-read-private user-read-email playlist-modify-private playlist-modify-public"
+		apiUri := fmt.Sprintf("%sresponse_type=code&client_id=%s&scope=%s&redirect_uri=%s&state=%s&show_dialog=true", spotifyAuthorizeURI, clientID, scope, redirectUri, state)
 
-		apiUri := fmt.Sprintf("%sresponse_type=code&client_id=%s&scope=%s&redirect_uri=%s&state=%s", spotifyAuthorizeURI, clientID, scope, redirectUri, state)
-		http.Redirect(w, r, apiUri, http.StatusOK)
+		http.Redirect(w, r, apiUri, http.StatusSeeOther)
 	}
 }
 
 func (s *server) handleGetToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		data := make(map[string]interface{})
+		data["success"] = false
 
 		r.ParseForm()
 		code, ok1 := r.Form["code"]
 		response_state, ok2 := r.Form["state"]
 		if !ok1 || !ok2 {
-			s.respond(w, r, "could not get a proper response from the spotify API", http.StatusBadRequest)
+			data["message"] = "could not get a proper response from the spotify API"
+			s.respond(w, r, data, http.StatusBadRequest)
 			return
 		}
 		if state != response_state[0] {
-			s.respond(w, r, "state was different", http.StatusBadRequest)
+			data["message"] = "state was different - there may be a security issue"
+			s.respond(w, r, data, http.StatusBadRequest)
 			return
 		}
 
@@ -83,7 +86,8 @@ func (s *server) handleGetToken() http.HandlerFunc {
 		newReq, err := http.NewRequest("POST", spotifyTokenURI, strings.NewReader(encodedBody))
 		if err != nil {
 			log.Println(err)
-			s.respond(w, r, err.Error(), http.StatusInternalServerError)
+			data["message"] = err.Error()
+			s.respond(w, r, data, http.StatusInternalServerError)
 			return
 		}
 
@@ -97,21 +101,24 @@ func (s *server) handleGetToken() http.HandlerFunc {
 		res, err := client.Do(newReq)
 		if err != nil {
 			log.Println(err)
-			s.respond(w, r, err.Error(), http.StatusInternalServerError)
+			data["message"] = err.Error()
+			s.respond(w, r, data, http.StatusInternalServerError)
 			return
 		}
 		defer res.Body.Close()
 		buffer, err := io.ReadAll(res.Body)
 		if err != nil {
 			log.Println(err)
-			s.respond(w, r, err.Error(), http.StatusInternalServerError)
+			data["message"] = err.Error()
+			s.respond(w, r, data, http.StatusInternalServerError)
 			return
 		}
 
 		if res.StatusCode >= http.StatusBadRequest {
 			log.Println(string(buffer))
 			info := fmt.Sprintf("Error communicating with spotify: %q", buffer)
-			s.respond(w, r, info, http.StatusInternalServerError)
+			data["message"] = info
+			s.respond(w, r, data, http.StatusInternalServerError)
 			return
 		}
 
@@ -123,6 +130,6 @@ func (s *server) handleGetToken() http.HandlerFunc {
 		timeToRefresh := time.Now().Add(time.Second * time.Duration(tokenLength))
 		s.timeToRefresh = timeToRefresh
 
-		s.respond(w, r, token, http.StatusOK)
+		http.Redirect(w, r, "http://localhost:3000/", http.StatusSeeOther)
 	}
 }
