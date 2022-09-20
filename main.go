@@ -15,14 +15,16 @@ var port string = "3008"
 
 var clientID string = "a9707d9bd77e483881a10560f5bdb42d"
 
-//go:embed .secret
+//go:embed .secret_client
 var clientSecret string
+
+//go:embed .secret_state
+var state string
 
 var spotifyAuthorizeURI = "https://accounts.spotify.com/authorize?"
 var spotifyTokenURI = "https://accounts.spotify.com/api/token"
 var spotifyApiURI = "https://api.spotify.com/v1"
 
-var state = "ajd93hflahe93lhf"
 var redirectUri = "http://localhost:3008/token"
 
 var myId = "onthe_dl"

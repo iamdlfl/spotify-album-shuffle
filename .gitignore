@@ -1,2 +1,4 @@
-.secret
+.secret*
+.env
 tmp
+session_key.go

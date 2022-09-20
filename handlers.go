@@ -57,6 +57,14 @@ func (s server) handleLogin() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleLogout() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.token = tokenResponse{}
+		s.timeToRefresh = time.Time{}
+		http.Redirect(w, r, "http://localhost:3000/", http.StatusSeeOther)
+	}
+}
+
 func (s *server) handleGetToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := make(map[string]interface{})

@@ -15,6 +15,7 @@ func (s *server) routes() {
 	s.mux.Path("/login").Methods(http.MethodGet).Handler(s.handleLogin())
 	s.mux.Path("/token").Methods(http.MethodGet).Handler(s.handleGetToken())
 	s.mux.Path("/logged_in").Methods(http.MethodGet).Handler(s.handleIsLoggedIn())
+	s.mux.Path("/logout").Methods(http.MethodGet).Handler(s.handleLogout())
 
 	token.Path("/me").Methods(http.MethodGet).Handler(s.handleGetUser())
 	token.Path("/playlists").Methods(http.MethodGet).Handler(s.handleGetPlaylists())
