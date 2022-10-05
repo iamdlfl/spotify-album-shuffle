@@ -22,11 +22,13 @@ func (s *server) routes() {
 	token.Path("/shuffle/{playlist_id}").Methods(http.MethodGet).Handler(s.handleShufflePlaylist())
 
 	// Middleware
-	s.mux.Use(mux.CORSMethodMiddleware(s.mux))
-	s.mux.Use(CorsOriginMiddleware)
+	if !localMode {
+		s.mux.Use(mux.CORSMethodMiddleware(s.mux))
+		s.mux.Use(CorsOriginMiddleware)
+	}
 
 	// static files
-	s.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(httpRoot)))
+	s.mux.PathPrefix("/static/").Handler(http.FileServer(httpRoot))
 	s.mux.PathPrefix("/").Handler(http.FileServer(httpRoot))
 
 	s.mux.NotFoundHandler = s.Handle404()

@@ -29,6 +29,8 @@ var redirectUri = "http://localhost:3008/token"
 
 var myId = "onthe_dl"
 
+var localMode = false
+
 var httpRoot http.FileSystem
 
 type server struct {

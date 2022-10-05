@@ -138,6 +138,6 @@ func (s *server) handleGetToken() http.HandlerFunc {
 		timeToRefresh := time.Now().Add(time.Second * time.Duration(tokenLength))
 		s.timeToRefresh = timeToRefresh
 
-		http.Redirect(w, r, "http://localhost:3000/", http.StatusSeeOther)
+		http.Redirect(w, r, "http://localhost:3008/", http.StatusSeeOther)
 	}
 }
