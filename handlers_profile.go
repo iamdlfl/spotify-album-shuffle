@@ -177,3 +177,81 @@ func (s *server) handleShufflePlaylist() http.HandlerFunc {
 		s.respond(w, r, jsonResponse2, http.StatusOK)
 	}
 }
+
+func (s *server) handleGetShow() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		allEpisodes := make([]Item, 0)
+		id := "04re9FvL1xviHGWvXKoAhZ"
+		showUri := spotifyApiURI + "/shows/" + id + "/episodes"
+		newReq, err := http.NewRequest("GET", showUri, nil)
+		if err != nil {
+			log.Println(err)
+			s.respond(w, r, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		newReq.Header.Set("Authorization", "Bearer "+s.token.AccessToken)
+		client := &http.Client{}
+		res, err := client.Do(newReq)
+		if err != nil {
+			log.Println(err)
+			s.respond(w, r, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer res.Body.Close()
+
+		buffer, err := io.ReadAll(res.Body)
+		if err != nil {
+			log.Println(err)
+			s.respond(w, r, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		var jsonResponse EpisodeList
+		err = json.Unmarshal(buffer, &jsonResponse)
+		if err != nil {
+			log.Println(err)
+			s.respond(w, r, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		items := jsonResponse.Items
+		allEpisodes = append(allEpisodes, items...)
+		limit := 20
+		lastLink := ""
+		for jsonResponse.Next != "" && jsonResponse.Next != lastLink && limit > 0 {
+			lastLink = jsonResponse.Next
+			newReq, err := http.NewRequest("GET", jsonResponse.Next, nil)
+			if err != nil {
+				log.Println(err)
+				s.respond(w, r, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			newReq.Header.Set("Authorization", "Bearer "+s.token.AccessToken)
+			client := &http.Client{}
+			res, err := client.Do(newReq)
+			if err != nil {
+				log.Println(err)
+				s.respond(w, r, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer res.Body.Close()
+
+			buffer, err := io.ReadAll(res.Body)
+			if err != nil {
+				log.Println(err)
+				s.respond(w, r, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			err = json.Unmarshal(buffer, &jsonResponse)
+			if err != nil {
+				log.Println(err)
+				s.respond(w, r, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			limit--
+			items := jsonResponse.Items
+			allEpisodes = append(allEpisodes, items...)
+		}
+
+		s.respond(w, r, allEpisodes, http.StatusOK)
+	}
+}

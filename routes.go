@@ -20,6 +20,7 @@ func (s *server) routes() {
 	token.Path("/me").Methods(http.MethodGet).Handler(s.handleGetUser())
 	token.Path("/playlists").Methods(http.MethodGet).Handler(s.handleGetPlaylists())
 	token.Path("/shuffle/{playlist_id}").Methods(http.MethodGet).Handler(s.handleShufflePlaylist())
+	token.Path("/show").Methods(http.MethodGet).Handler(s.handleGetShow())
 
 	// Middleware
 	if !localMode {

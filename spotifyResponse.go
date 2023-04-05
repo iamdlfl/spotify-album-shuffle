@@ -159,3 +159,80 @@ type TrackType string
 const (
 	Track TrackType = "track"
 )
+
+type Show struct {
+	AvailableMarkets   []string     `json:"available_markets"`
+	Copyrights         []Copyright  `json:"copyrights"`
+	Description        string       `json:"description"`
+	HTMLDescription    string       `json:"html_description"`
+	Explicit           bool         `json:"explicit"`
+	ExternalUrls       ExternalUrls `json:"external_urls"`
+	Href               string       `json:"href"`
+	ID                 string       `json:"id"`
+	Images             []Image      `json:"images"`
+	IsExternallyHosted bool         `json:"is_externally_hosted"`
+	Languages          []string     `json:"languages"`
+	MediaType          string       `json:"media_type"`
+	Name               string       `json:"name"`
+	Publisher          string       `json:"publisher"`
+	Type               string       `json:"type"`
+	URI                string       `json:"uri"`
+	TotalEpisodes      int64        `json:"total_episodes"`
+	Episodes           Episodes     `json:"episodes"`
+}
+
+type Copyright struct {
+	Text string `json:"text"`
+	Type string `json:"type"`
+}
+
+type Episodes struct {
+	Href     string `json:"href"`
+	Limit    int64  `json:"limit"`
+	Next     string `json:"next"`
+	Offset   int64  `json:"offset"`
+	Previous string `json:"previous"`
+	Total    int64  `json:"total"`
+	Items    []Item `json:"items"`
+}
+
+type Item struct {
+	AudioPreviewURL      string       `json:"audio_preview_url"`
+	Description          string       `json:"description"`
+	HTMLDescription      string       `json:"html_description"`
+	DurationMS           int64        `json:"duration_ms"`
+	Explicit             bool         `json:"explicit"`
+	ExternalUrls         ExternalUrls `json:"external_urls"`
+	Href                 string       `json:"href"`
+	ID                   string       `json:"id"`
+	Images               []Image      `json:"images"`
+	IsExternallyHosted   bool         `json:"is_externally_hosted"`
+	IsPlayable           bool         `json:"is_playable"`
+	Language             string       `json:"language"`
+	Languages            []string     `json:"languages"`
+	Name                 string       `json:"name"`
+	ReleaseDate          string       `json:"release_date"`
+	ReleaseDatePrecision string       `json:"release_date_precision"`
+	ResumePoint          ResumePoint  `json:"resume_point"`
+	Type                 string       `json:"type"`
+	URI                  string       `json:"uri"`
+	Restrictions         Restrictions `json:"restrictions"`
+}
+type Restrictions struct {
+	Reason string `json:"reason"`
+}
+
+type ResumePoint struct {
+	FullyPlayed      bool  `json:"fully_played"`
+	ResumePositionMS int64 `json:"resume_position_ms"`
+}
+
+type EpisodeList struct {
+	Href     string `json:"href"`
+	Limit    int64  `json:"limit"`
+	Next     string `json:"next"`
+	Offset   int64  `json:"offset"`
+	Previous string `json:"previous"`
+	Total    int64  `json:"total"`
+	Items    []Item `json:"items"`
+}

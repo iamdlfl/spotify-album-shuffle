@@ -4,3 +4,4 @@ tmp
 session_key.go
 static/*
 !static/index.html
+session.db
